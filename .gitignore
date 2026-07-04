@@ -1,0 +1,13 @@
+# Local Claude Code / editor settings (machine-specific paths)
+.claude/
+.vscode/
+.idea/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (in case tooling is added later)
+node_modules/
+npm-debug.log*

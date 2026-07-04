@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Prompt Forge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 2L13.5 8.5H20.5L14.5 12.5L17 19L11 15L5 19L7.5 12.5L1.5 8.5H8.5L11 2Z" fill="url(#starGrad)" stroke="none"/>
+          <defs>
+            <linearGradient id="starGrad" x1="1.5" y1="2" x2="20.5" y2="19" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="header-title">
+        <span class="title-main">Prompt Forge</span>
+        <span class="title-badge">for Claude</span>
+      </div>
+    </div>
+    <button id="settingsBtn" class="icon-btn" title="API Settings" aria-label="Open settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Settings Panel -->
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-inner">
+      <h3 class="settings-title">API Configuration</h3>
+
+      <!-- Provider Toggle -->
+      <div class="field-group">
+        <label class="field-label">Provider</label>
+        <div class="provider-toggle" id="providerToggle">
+          <button class="provider-btn active" id="providerAnthropicBtn" data-provider="anthropic">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Anthropic Claude
+          </button>
+          <button class="provider-btn" id="providerNimBtn" data-provider="nvidia-nim">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            NVIDIA NIM
+          </button>
+        </div>
+      </div>
+
+      <!-- Anthropic Key (shown when provider = anthropic) -->
+      <div class="field-group" id="anthropicKeyGroup">
+        <label for="apiKeyInput" class="field-label">Anthropic API Key</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="apiKeyInput"
+            class="field-input"
+            placeholder="sk-ant-api03-..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="toggleKeyVisibility" class="input-action-btn" aria-label="Toggle visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <p class="field-hint">
+          Stored locally, never shared. &nbsp;
+          <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="hint-link">Get your key →</a>
+        </p>
+      </div>
+
+      <!-- NVIDIA NIM Key (shown when provider = nvidia-nim) -->
+      <div class="field-group hidden" id="nimKeyGroup">
+        <label for="nimApiKeyInput" class="field-label">NVIDIA NIM API Key</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="nimApiKeyInput"
+            class="field-input"
+            placeholder="nvapi-..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="toggleNimKeyVisibility" class="input-action-btn" aria-label="Toggle NIM key visibility">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <p class="field-hint">
+          Stored locally, never shared. &nbsp;
+          <a href="https://build.nvidia.com/explore/discover" target="_blank" rel="noopener" class="hint-link">Get your key →</a>
+        </p>
+      </div>
+
+      <!-- Dynamic Model Selector -->
+      <div class="field-group">
+        <label for="modelSelect" class="field-label">Model</label>
+        <select id="modelSelect" class="field-select">
+          <!-- Populated dynamically by popup.js -->
+        </select>
+        <p class="field-hint" id="modelHint"></p>
+      </div>
+
+      <button id="saveSettingsBtn" class="btn btn-primary" style="width:100%;">Save Settings</button>
+      <div id="settingsSavedMsg" class="save-msg hidden">✓ Settings saved</div>
+    </div>
+  </div>
+
+
+  <!-- Main App -->
+  <main class="main" id="mainView">
+    <!-- Input Section -->
+    <section class="section">
+      <div class="section-header">
+        <label for="promptInput" class="section-label">Your Prompt</label>
+        <span class="char-count" id="charCount">0 / 2000</span>
+      </div>
+      <div class="textarea-wrapper">
+        <textarea
+          id="promptInput"
+          class="prompt-textarea"
+          placeholder="Describe what you want Claude to do... e.g. 'Write a Python script to scrape product prices from Amazon and export them to a CSV file'"
+          maxlength="2000"
+          rows="5"
+          spellcheck="true"
+        ></textarea>
+        <button id="clearPromptBtn" class="clear-btn hidden" aria-label="Clear prompt">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Example Chips -->
+      <div class="examples-row">
+        <span class="examples-label">Try:</span>
+        <div class="chips" id="exampleChips">
+          <button class="chip" data-prompt="Build a REST API with Node.js and Express that handles user authentication with JWT tokens">REST API</button>
+          <button class="chip" data-prompt="Create a Python web scraper that extracts product listings from e-commerce sites and saves to CSV">Web Scraper</button>
+          <button class="chip" data-prompt="Write a compelling LinkedIn post about the future of AI in software development">LinkedIn Post</button>
+          <button class="chip" data-prompt="Debug and fix performance issues in a slow React application with large data tables">Debug React</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forge Button -->
+    <button id="forgeBtn" class="btn btn-forge" aria-label="Transform prompt into a Claude-optimized prompt">
+      <span class="btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </span>
+      <span class="btn-text" id="forgeBtnText">Forge Prompt</span>
+      <span class="btn-loader hidden" id="forgeBtnLoader">
+        <span class="spinner"></span>
+        <span>Forging...</span>
+      </span>
+    </button>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner hidden" role="alert">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="errorMessage"></span>
+    </div>
+
+    <!-- Output Section -->
+    <section class="section output-section hidden" id="outputSection">
+      <div class="section-header">
+        <label class="section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-green)">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Claude-Optimized Prompt
+        </label>
+        <div class="output-actions">
+          <button id="copyBtn" class="action-btn" title="Copy paste-ready Claude prompt">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
+          <button id="downloadBtn" class="action-btn" title="Download JSON">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+          </button>
+          <button id="resetBtn" class="action-btn" title="Reset">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-4.54"/>
+            </svg>
+            New
+          </button>
+        </div>
+      </div>
+
+      <!-- JSON Field Cards -->
+      <div class="json-fields" id="jsonFields"></div>
+
+      <!-- Raw JSON Toggle -->
+      <div class="raw-toggle">
+        <button id="rawToggleBtn" class="raw-toggle-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          View Raw JSON
+        </button>
+      </div>
+      <div id="rawJsonPanel" class="raw-json-panel hidden">
+        <pre id="rawJsonOutput" class="raw-json"></pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
